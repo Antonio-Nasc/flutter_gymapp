@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gymapp/screens/exercise_screen.dart';
+import 'package:flutter_gymapp/screens/authentication_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,6 +10,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: ExerciseScreen());
+    return MaterialApp(home: AuthenticationScreen());
   }
 }
