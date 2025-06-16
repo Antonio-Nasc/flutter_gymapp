@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gymapp/_commom/my_colors.dart';
+import 'package:flutter_gymapp/_commom/my_snackbar.dart';
 import 'package:flutter_gymapp/components/authentication_input_decoration.dart';
 import 'package:flutter_gymapp/services/authentication_service.dart';
 
@@ -163,7 +164,19 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
       if (queroEntrar) {
         print("Entrada valida");
       } else {
-        _authService.registerUser(nome: nome, senha: senha, email: email);
+        _authService.registerUser(nome: nome, senha: senha, email: email).then((
+          String? erro,
+        ) {
+          if (erro != null) {
+            showSnackBar(context: context, text: erro);
+          } else {
+            showSnackBar(
+              context: context,
+              text: "Cadastro efetuado com sucesso",
+              isError: false,
+            );
+          }
+        });
       }
     } else {
       print("Inválido");
