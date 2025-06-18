@@ -162,19 +162,19 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
     if (_formKey.currentState!.validate()) {
       if (queroEntrar) {
-        print("Entrada valida");
+        _authService.SignUser(email: email, password: senha).then((
+          String? erro,
+        ) {
+          if (erro != null) {
+            showSnackBar(context: context, text: erro);
+          }
+        });
       } else {
         _authService.registerUser(nome: nome, senha: senha, email: email).then((
           String? erro,
         ) {
           if (erro != null) {
             showSnackBar(context: context, text: erro);
-          } else {
-            showSnackBar(
-              context: context,
-              text: "Cadastro efetuado com sucesso",
-              isError: false,
-            );
           }
         });
       }
