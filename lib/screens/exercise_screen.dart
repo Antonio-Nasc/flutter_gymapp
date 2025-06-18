@@ -4,13 +4,9 @@ import 'package:flutter_gymapp/models/exercise_model.dart';
 import 'package:flutter_gymapp/models/feeling_model.dart';
 
 class ExerciseScreen extends StatelessWidget {
-  ExerciseScreen({super.key});
-  final ExerciseModel exerciseModel = ExerciseModel(
-    id: "01",
-    name: "Remada Baixa Supinada",
-    training: "Treino A",
-    howToDoIt: "Segura a barra e puxa",
-  );
+  final ExerciseModel exerciseModel;
+  ExerciseScreen({super.key, required this.exerciseModel});
+
   final List<FeelingModel> listFeeling = [
     FeelingModel(id: "01", feeling: "Pouca ativação hoje", date: "2025-06-01"),
     FeelingModel(id: "02", feeling: "Ganhei mais força", date: "2025-06-03"),
