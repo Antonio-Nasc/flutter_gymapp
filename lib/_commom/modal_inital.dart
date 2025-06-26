@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gymapp/_commom/my_colors.dart';
 import 'package:flutter_gymapp/components/authentication_input_decoration.dart';
+import 'package:flutter_gymapp/models/exercise_model.dart';
+import 'package:flutter_gymapp/models/feeling_model.dart';
+import 'package:flutter_gymapp/services/exercise_service.dart';
+import 'package:uuid/uuid.dart';
 
 ShowModalInitial(BuildContext context) {
   showModalBottomSheet(
@@ -30,7 +34,44 @@ class _ExerciseModalState extends State<ExerciseModal> {
   TextEditingController _notesController = TextEditingController();
   TextEditingController _feelingController = TextEditingController();
 
+  ExerciseService _exerciseService = ExerciseService();
+
   bool isLoading = false;
+  sendClick() {
+    setState(() {
+      isLoading = true;
+      String name = _nameController.text;
+      String training = _trainingController.text;
+      String notes = _notesController.text;
+      String feeling = _feelingController.text;
+
+      ExerciseModel exerciseModel = ExerciseModel(
+        id: const Uuid().v1(),
+        name: name,
+        training: training,
+        howToDoIt: notes,
+      );
+      _exerciseService.addExercise(exerciseModel).then((value) {
+        if (feeling != "") {
+          FeelingModel feelingModel = FeelingModel(
+            id: Uuid().v1(),
+            feeling: feeling,
+            date: DateTime.now().toString(),
+          );
+          _exerciseService.addFeeling(exerciseModel.id, feelingModel);
+          setState(() {
+            isLoading = false;
+            Navigator.pop(context);
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+            Navigator.pop(context);
+          });
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +107,8 @@ class _ExerciseModalState extends State<ExerciseModal> {
                 ),
                 const Divider(),
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 16),
                     TextFormField(
@@ -82,6 +125,11 @@ class _ExerciseModalState extends State<ExerciseModal> {
                         "Qual treino pertence?",
                         icon: Icon(Icons.list_alt_rounded, color: Colors.white),
                       ),
+                    ),
+                    Text(
+                      "Use o mesmo nome para exercícios que pertencem ao mesmo treino",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     SizedBox(height: 16),
                     TextFormField(
@@ -103,6 +151,11 @@ class _ExerciseModalState extends State<ExerciseModal> {
                         ),
                       ),
                       maxLines: null,
+                    ),
+                    Text(
+                      "Opcional",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
