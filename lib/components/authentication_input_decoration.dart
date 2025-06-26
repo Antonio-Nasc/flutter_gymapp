@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gymapp/_commom/my_colors.dart';
 
-InputDecoration getAuthenticationInputDecoration(String Label) {
+InputDecoration getAuthenticationInputDecoration(String Label, {Icon? icon}) {
   return InputDecoration(
+    icon: icon,
     hintText: Label,
     fillColor: Colors.white,
     filled: true,

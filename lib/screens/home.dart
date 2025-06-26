@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gymapp/_commom/modal_inital.dart';
 import 'package:flutter_gymapp/models/exercise_model.dart';
 import 'package:flutter_gymapp/screens/exercise_screen.dart';
 import 'package:flutter_gymapp/services/authentication_service.dart';
@@ -92,6 +93,12 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          ShowModalInitial(context);
+        },
       ),
       body: ListView(
         children: List.generate(listExercices.length, (index) {
