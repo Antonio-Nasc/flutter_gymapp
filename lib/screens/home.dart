@@ -4,6 +4,7 @@ import 'package:flutter_gymapp/_commom/modal_inital.dart';
 import 'package:flutter_gymapp/models/exercise_model.dart';
 import 'package:flutter_gymapp/screens/exercise_screen.dart';
 import 'package:flutter_gymapp/services/authentication_service.dart';
+import 'package:flutter_gymapp/services/exercise_service.dart';
 
 class Home extends StatefulWidget {
   final User user;
@@ -14,56 +15,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<ExerciseModel> listExercices = [
-    ExerciseModel(
-      id: "1",
-      name: "Puxada Alta Pronada",
-      training: "Treino A",
-      howToDoIt: "Puxada",
-    ),
-    ExerciseModel(
-      id: "2",
-      name: "Remad Supinada",
-      training: "Treino B",
-      howToDoIt: "Puxada",
-    ),
-    ExerciseModel(
-      id: "1",
-      name: "Puxada Alta Pronada",
-      training: "Treino A",
-      howToDoIt: "Puxada",
-    ),
-    ExerciseModel(
-      id: "2",
-      name: "Remad Supinada",
-      training: "Treino B",
-      howToDoIt: "Puxada",
-    ),
-    ExerciseModel(
-      id: "1",
-      name: "Puxada Alta Pronada",
-      training: "Treino A",
-      howToDoIt: "Puxada",
-    ),
-    ExerciseModel(
-      id: "2",
-      name: "Remad Supinada",
-      training: "Treino B",
-      howToDoIt: "Puxada",
-    ),
-    ExerciseModel(
-      id: "1",
-      name: "Puxada Alta Pronada",
-      training: "Treino A",
-      howToDoIt: "Puxada",
-    ),
-    ExerciseModel(
-      id: "2",
-      name: "Remad Supinada",
-      training: "Treino B",
-      howToDoIt: "Puxada",
-    ),
-  ];
+  final ExerciseService service = ExerciseService();
 
   @override
   Widget build(BuildContext context) {
@@ -100,23 +52,48 @@ class _HomeState extends State<Home> {
           ShowModalInitial(context);
         },
       ),
-      body: ListView(
-        children: List.generate(listExercices.length, (index) {
-          ExerciseModel exerciseModel = listExercices[index];
-          return ListTile(
-            title: Text(exerciseModel.name),
-            subtitle: Text(exerciseModel.training),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ExerciseScreen(exerciseModel: exerciseModel),
-                ),
+      body: StreamBuilder(
+        stream: service.conectStreamExercise(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            if (snapshot.hasData &&
+                snapshot.data != null &&
+                snapshot.data!.docs.isNotEmpty) {
+              List<ExerciseModel> listExercise = [];
+              for (var doc in snapshot.data!.docs) {
+                listExercise.add(ExerciseModel.fromMap(doc.data()));
+              }
+              return ListView(
+                children: List.generate(listExercise.length, (index) {
+                  ExerciseModel exerciseModel = listExercise[index];
+                  return ListTile(
+                    title: Text(exerciseModel.name),
+                    subtitle: Text(exerciseModel.training),
+                    trailing: IconButton(
+                      onPressed: () {
+                        ShowModalInitial(context, exercise: exerciseModel);
+                      },
+                      icon: Icon(Icons.edit),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ExerciseScreen(exerciseModel: exerciseModel),
+                        ),
+                      );
+                    },
+                  );
+                }),
               );
-            },
-          );
-        }),
+            } else {
+              return const Center(child: Text("Ainda nenhum exercício."));
+            }
+          }
+        },
       ),
     );
   }

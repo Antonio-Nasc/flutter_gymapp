@@ -23,4 +23,8 @@ class ExerciseService {
         .doc(feelingModel.id)
         .set(feelingModel.toMap());
   }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> conectStreamExercise() {
+    return _firestore.collection(userId).snapshots();
+  }
 }

@@ -6,7 +6,7 @@ import 'package:flutter_gymapp/models/feeling_model.dart';
 import 'package:flutter_gymapp/services/exercise_service.dart';
 import 'package:uuid/uuid.dart';
 
-ShowModalInitial(BuildContext context) {
+ShowModalInitial(BuildContext context, {ExerciseModel? exercise}) {
   showModalBottomSheet(
     context: context,
     backgroundColor: MyColors.azulEscuro,
@@ -16,13 +16,14 @@ ShowModalInitial(BuildContext context) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
     ),
     builder: (context) {
-      return const ExerciseModal();
+      return ExerciseModal(exerciseModel: exercise);
     },
   );
 }
 
 class ExerciseModal extends StatefulWidget {
-  const ExerciseModal({super.key});
+  final ExerciseModel? exerciseModel;
+  const ExerciseModal({super.key, this.exerciseModel});
 
   @override
   State<ExerciseModal> createState() => _ExerciseModalState();
@@ -35,6 +36,16 @@ class _ExerciseModalState extends State<ExerciseModal> {
   TextEditingController _feelingController = TextEditingController();
 
   ExerciseService _exerciseService = ExerciseService();
+
+  @override
+  void initState() {
+    if (widget.exerciseModel != null) {
+      _nameController.text = widget.exerciseModel!.name;
+      _trainingController.text = widget.exerciseModel!.training;
+      _notesController.text = widget.exerciseModel!.howToDoIt;
+    }
+    super.initState();
+  }
 
   bool isLoading = false;
   sendClick() {
@@ -51,6 +62,9 @@ class _ExerciseModalState extends State<ExerciseModal> {
         training: training,
         howToDoIt: notes,
       );
+      if (widget.exerciseModel != null) {
+        exerciseModel.id = widget.exerciseModel!.id;
+      }
       _exerciseService.addExercise(exerciseModel).then((value) {
         if (feeling != "") {
           FeelingModel feelingModel = FeelingModel(
@@ -89,12 +103,17 @@ class _ExerciseModalState extends State<ExerciseModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Adicionar Exercício",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    Flexible(
+                      child: Text(
+                        (widget.exerciseModel != null)
+                            ? "Editar ${widget.exerciseModel!.name}"
+                            : "Adicionar Exercício",
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     IconButton(
@@ -140,22 +159,29 @@ class _ExerciseModalState extends State<ExerciseModal> {
                       ),
                       maxLines: null,
                     ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: _feelingController,
-                      decoration: getAuthenticationInputDecoration(
-                        "Como você está se sentindo?",
-                        icon: Icon(
-                          Icons.emoji_emotions_rounded,
-                          color: Colors.white,
-                        ),
+                    Visibility(
+                      visible: (widget.exerciseModel == null),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 16),
+                          TextFormField(
+                            controller: _feelingController,
+                            decoration: getAuthenticationInputDecoration(
+                              "Como você está se sentindo?",
+                              icon: Icon(
+                                Icons.emoji_emotions_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                            maxLines: null,
+                          ),
+                          Text(
+                            "Opcional",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ],
                       ),
-                      maxLines: null,
-                    ),
-                    Text(
-                      "Opcional",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
@@ -172,7 +198,11 @@ class _ExerciseModalState extends State<ExerciseModal> {
                         color: MyColors.azulEscuro,
                       ),
                     )
-                  : Text("Criar Exercício"),
+                  : Text(
+                      (widget.exerciseModel != null)
+                          ? "Editar exercício"
+                          : "Criar Exercício",
+                    ),
             ),
           ],
         ),
