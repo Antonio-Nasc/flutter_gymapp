@@ -189,7 +189,9 @@ class _ExerciseModalState extends State<ExerciseModal> {
             ),
 
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                sendClick();
+              },
               child: (isLoading)
                   ? const SizedBox(
                       height: 16,
