@@ -30,12 +30,12 @@ class ExerciseModal extends StatefulWidget {
 }
 
 class _ExerciseModalState extends State<ExerciseModal> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _trainingController = TextEditingController();
-  TextEditingController _notesController = TextEditingController();
-  TextEditingController _feelingController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _trainingController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _feelingController = TextEditingController();
 
-  ExerciseService _exerciseService = ExerciseService();
+  final ExerciseService _exerciseService = ExerciseService();
 
   @override
   void initState() {

@@ -24,7 +24,16 @@ class ExerciseService {
         .set(feelingModel.toMap());
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> conectStreamExercise() {
-    return _firestore.collection(userId).snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> conectStreamExercise(
+    bool isDescending,
+  ) {
+    return _firestore
+        .collection(userId)
+        .orderBy("training", descending: isDescending)
+        .snapshots();
+  }
+
+  Future<void> removeExercise({required String idExercise}) {
+    return _firestore.collection(userId).doc(idExercise).delete();
   }
 }

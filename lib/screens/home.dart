@@ -1,14 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gymapp/_commom/modal_inital.dart';
+import 'package:flutter_gymapp/_commom/my_colors.dart';
+import 'package:flutter_gymapp/components/initial_list_widget.dart';
 import 'package:flutter_gymapp/models/exercise_model.dart';
-import 'package:flutter_gymapp/screens/exercise_screen.dart';
 import 'package:flutter_gymapp/services/authentication_service.dart';
 import 'package:flutter_gymapp/services/exercise_service.dart';
 
 class Home extends StatefulWidget {
   final User user;
-  Home({super.key, required this.user});
+  const Home({super.key, required this.user});
 
   @override
   State<Home> createState() => _HomeState();
@@ -16,11 +17,25 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final ExerciseService service = ExerciseService();
+  bool isDescending = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Meus exercícios")),
+      backgroundColor: Colors.blue,
+      appBar: AppBar(
+        title: const Text("Meus exercícios"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                isDescending = !isDescending;
+              });
+            },
+            icon: Icon(Icons.sort_by_alpha_rounded),
+          ),
+        ],
+      ),
       drawer: Drawer(
         child: ListView(
           children: [
@@ -52,48 +67,36 @@ class _HomeState extends State<Home> {
           ShowModalInitial(context);
         },
       ),
-      body: StreamBuilder(
-        stream: service.conectStreamExercise(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (snapshot.hasData &&
-                snapshot.data != null &&
-                snapshot.data!.docs.isNotEmpty) {
-              List<ExerciseModel> listExercise = [];
-              for (var doc in snapshot.data!.docs) {
-                listExercise.add(ExerciseModel.fromMap(doc.data()));
-              }
-              return ListView(
-                children: List.generate(listExercise.length, (index) {
-                  ExerciseModel exerciseModel = listExercise[index];
-                  return ListTile(
-                    title: Text(exerciseModel.name),
-                    subtitle: Text(exerciseModel.training),
-                    trailing: IconButton(
-                      onPressed: () {
-                        ShowModalInitial(context, exercise: exerciseModel);
-                      },
-                      icon: Icon(Icons.edit),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ExerciseScreen(exerciseModel: exerciseModel),
-                        ),
-                      );
-                    },
-                  );
-                }),
-              );
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: StreamBuilder(
+          stream: service.conectStreamExercise(isDescending),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
             } else {
-              return const Center(child: Text("Ainda nenhum exercício."));
+              if (snapshot.hasData &&
+                  snapshot.data != null &&
+                  snapshot.data!.docs.isNotEmpty) {
+                List<ExerciseModel> listExercise = [];
+                for (var doc in snapshot.data!.docs) {
+                  listExercise.add(ExerciseModel.fromMap(doc.data()));
+                }
+                return ListView(
+                  children: List.generate(listExercise.length, (index) {
+                    ExerciseModel exerciseModel = listExercise[index];
+                    return InitialItemList(
+                      exerciseModel: exerciseModel,
+                      service: service,
+                    );
+                  }),
+                );
+              } else {
+                return const Center(child: Text("Ainda nenhum exercício."));
+              }
             }
-          }
-        },
+          },
+        ),
       ),
     );
   }
